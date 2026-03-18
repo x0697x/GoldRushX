@@ -1,5 +1,4 @@
 //{{NO_DEPENDENCIES}}
-// Utilisé par GoldRushX.rc
 //
 #define IDI_ICON1                       101
 
