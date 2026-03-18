@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="GoldRushX/GoldRushX.vcxproj" Id="edc15b99-b987-4f80-b5e1-f1991bfaaf9f" />
+</Solution>
