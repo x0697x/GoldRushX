@@ -12,11 +12,12 @@
 #include <time.h>
 
 float appversion = 0.2;
-#define MAX_HEALTH 100
+#define MAX_HEALTH  100
 #define MAX_STAMINA 100
-int health = MAX_HEALTH;
-int stamina = MAX_STAMINA;
-int gold = 0;
+
+int  health = MAX_HEALTH;
+int  stamina = MAX_STAMINA;
+int  gold = 0;
 char name[50];
 
 void saveGame();
@@ -31,28 +32,45 @@ void checkGold();
 void buy();
 void mine();
 void combat();
+void combatBoss1();
 
-void clearInputBuffer() {
+/* -------------------------------------------------------------------------
+   Utility
+   ------------------------------------------------------------------------- */
+
+void clearInputBuffer()
+{
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
 }
+
+/* -------------------------------------------------------------------------
+   Entry point
+   ------------------------------------------------------------------------- */
 
 int main()
 {
 	srand(time(NULL));
 	loadGame();
+
 	if (name[0] == '\0')
 	{
 		enterName();
 	}
+
 	printf("Welcome to GoldRushX version %.1f, %s!\n\n", appversion, name);
 	pause();
 	menu();
+
 	printf("\nThanks for playing GoldRushX!\n");
 	printf("(Made with love by J.)\n\n");
 	saveGame();
 	return 0;
 }
+
+/* -------------------------------------------------------------------------
+   Save / Load
+   ------------------------------------------------------------------------- */
 
 void encryptDecrypt(char* data)
 {
@@ -65,16 +83,15 @@ void encryptDecrypt(char* data)
 void saveGame()
 {
 	FILE* file = fopen("save.txt", "w");
-	if (file == NULL) {
+	if (file == NULL)
+	{
 		printf("Error saving game!\n\n");
 		return;
 	}
 
 	char buffer[256];
 	sprintf(buffer, "%s|%d|%d|%d", name, health, stamina, gold);
-
 	encryptDecrypt(buffer);
-
 	fprintf(file, "%s", buffer);
 
 	fclose(file);
@@ -83,7 +100,8 @@ void saveGame()
 void loadGame()
 {
 	FILE* file = fopen("save.txt", "r");
-	if (file == NULL) {
+	if (file == NULL)
+	{
 		printf("No save file found.\n\n");
 		name[0] = '\0';
 		return;
@@ -93,7 +111,6 @@ void loadGame()
 	if (fgets(buffer, sizeof(buffer), file))
 	{
 		encryptDecrypt(buffer);
-
 		sscanf(buffer, "%[^|]|%d|%d|%d", name, &health, &stamina, &gold);
 	}
 
@@ -101,7 +118,12 @@ void loadGame()
 	printf("Game loaded successfully!\n\n");
 }
 
-void pause() {
+/* -------------------------------------------------------------------------
+   UI helpers
+   ------------------------------------------------------------------------- */
+
+void pause()
+{
 	printf("\nPress Enter to continue...");
 	getchar();
 }
@@ -114,45 +136,22 @@ void header()
 	printf("--------------------------\n\n");
 }
 
-void menu()
+void enterName()
 {
-	int choice;
-	while (1)
-	{
-		system("cls");
-		header();
-		printf("1. Mine for Gold\n");
-		printf("2. Fight a Monster\n");
-		printf("3. Buy Potions\n");
-		printf("0. Exit Game\n\n");
+	printf("What is your name?\n\n");
+	fgets(name, sizeof(name), stdin);
 
-		if (scanf("%d", &choice) != 1) {
-			printf("\nInvalid input. Please enter a number.\n\n");
-			clearInputBuffer();
-			pause();
-			continue;
-		}
-		clearInputBuffer();
+	size_t len = strlen(name);
+	if (len > 0 && name[len - 1] == '\n')
+		name[len - 1] = '\0';
 
-		switch (choice)
-		{
-		case 1:
-			mine();
-			break;
-		case 2:
-			combat();
-			break;
-		case 3:
-			buy();
-			break;
-		case 0:
-			return;
-		default:
-			printf("\nInvalid choice.\n\n");
-			pause();
-		}
-	}
+	saveGame();
+	printf("\n");
 }
+
+/* -------------------------------------------------------------------------
+   Stat checks
+   ------------------------------------------------------------------------- */
 
 void checkHealth()
 {
@@ -190,16 +189,58 @@ void checkGold()
 	}
 }
 
-void enterName()
+/* -------------------------------------------------------------------------
+   Menu
+   ------------------------------------------------------------------------- */
+
+void menu()
 {
-	printf("What is your name?\n\n");
-	fgets(name, sizeof(name), stdin);
-	size_t len = strlen(name);
-	if (len > 0 && name[len - 1] == '\n')
-		name[len - 1] = '\0';
-	saveGame();
-	printf("\n");
+	int choice;
+	while (1)
+	{
+		system("cls");
+		header();
+		printf("1. Mine for Gold\n");
+		printf("2. Fight a Monster\n");
+		printf("3. Fight Boss 1\n");
+		printf("4. Buy Potions\n");
+		printf("0. Exit Game\n\n");
+
+		if (scanf("%d", &choice) != 1)
+		{
+			printf("\nInvalid input. Please enter a number.\n\n");
+			clearInputBuffer();
+			pause();
+			continue;
+		}
+		clearInputBuffer();
+
+		switch (choice)
+		{
+		case 1:
+			mine();
+			break;
+		case 2:
+			combat();
+			break;
+		case 3:
+			combatBoss1();
+			break;
+		case 4:
+			buy();
+			break;
+		case 0:
+			return;
+		default:
+			printf("\nInvalid choice.\n\n");
+			pause();
+		}
+	}
 }
+
+/* -------------------------------------------------------------------------
+   Shop
+   ------------------------------------------------------------------------- */
 
 void buy()
 {
@@ -210,9 +251,9 @@ void buy()
 		system("cls");
 		header();
 		printf("--- SHOP ---\n");
-		printf("1. Buy 10 Health (10 Gold)\n");
+		printf("1. Buy 10 Health  (10 Gold)\n");
 		printf("2. Buy 10 Stamina (10 Gold)\n");
-		printf(" 0. Exit Shop\n\n");
+		printf("0. Exit Shop\n\n");
 
 		if (scanf("%d", &choice) != 1)
 		{
@@ -276,6 +317,11 @@ void buy()
 		}
 	}
 }
+
+/* -------------------------------------------------------------------------
+   Actions
+   ------------------------------------------------------------------------- */
+
 void mine()
 {
 	int choice;
@@ -294,10 +340,11 @@ void mine()
 			printf("\nMining in progress...");
 			for (int i = 5; i > 0; i--)
 			{
-				printf("\r%2d seconds remaining...", i);
+				printf("\r%2d seconds remaining...           ", i);
 				fflush(stdout);
 				Sleep(1000);
 			}
+
 			int staminaLoss = rand() % 26 + 5;
 			stamina -= staminaLoss;
 			int loot = rand() % 50 + 1;
@@ -335,15 +382,16 @@ void combat()
 			printf("\nFighting in progress...");
 			for (int i = 5; i > 0; i--)
 			{
-				printf("\r%2d seconds remaining...", i);
+				printf("\r%2d seconds remaining...           ", i);
 				fflush(stdout);
 				Sleep(1000);
 			}
+
 			int damage = rand() % 26 + 5;
-			health -= damage;
 			int staminaLoss = rand() % 31 + 10;
+			int loot = rand() % 91 + 10;
+			health -= damage;
 			stamina -= staminaLoss;
-			int loot = rand() % 100 + 1;
 			gold += loot;
 			checkHealth();
 			checkStamina();
@@ -355,6 +403,50 @@ void combat()
 		else
 		{
 			printf("\nYou need at least 20 health and 30 stamina to fight.\n\n");
+			pause();
+		}
+	}
+}
+
+void combatBoss1()
+{
+	int choice;
+	printf("\nYou encounter the Boss 1! Do you want to fight it? (1 for Yes, 0 for No)\n\n");
+
+	if (scanf("%d", &choice) != 1) {
+		clearInputBuffer();
+		return;
+	}
+	clearInputBuffer();
+
+	if (choice == 1)
+	{
+		if (health >= 30 && stamina >= 45)
+		{
+			printf("\nFighting the Boss in progress...");
+			for (int i = 10; i > 0; i--)
+			{
+				printf("\r%2d seconds remaining...            ", i);
+				fflush(stdout);
+				Sleep(1000);
+			}
+
+			int damage = rand() % 39 + 7;
+			int staminaLoss = rand() % 46 + 15;
+			int loot = rand() % 136 + 15;
+			health -= damage;
+			stamina -= staminaLoss;
+			gold += loot;
+			checkHealth();
+			checkStamina();
+			printf("\n");
+			saveGame();
+			printf("\nVictory! You defeated the Boss 1 and found %d gold, lost %d health and %d stamina!\n\n", loot, damage, staminaLoss);
+			pause();
+		}
+		else
+		{
+			printf("\nYou need at least 30 health and 45 stamina to fight the Boss 1.\n\n");
 			pause();
 		}
 	}
