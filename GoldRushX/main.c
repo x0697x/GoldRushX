@@ -198,8 +198,7 @@ void checkGold()
 {
 	if (gold <= 0)
 	{
-		printf("\n\nYou are broke. Get a life\n\n");
-		pause();
+		gold = 0;
 	}
 }
 
@@ -456,7 +455,7 @@ void combatBoss1()
 
 	if (choice == 1)
 	{
-		if (health >= 30 && stamina >= 45)
+		if (health >= 30 && stamina >= 45 && level >= 3)
 		{
 			printf("\nFighting the Boss in progress...");
 			for (int i = 10; i > 0; i--)
@@ -484,7 +483,7 @@ void combatBoss1()
 		}
 		else
 		{
-			printf("\nYou need at least 30 health and 45 stamina to fight the Boss 1.\n\n");
+			printf("\nYou need at least 30 health, 45 stamina and level 3 to fight the Boss 1.\n\n");
 			pause();
 		}
 	}
