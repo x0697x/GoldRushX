@@ -14,10 +14,13 @@
 float appversion = 0.2;
 #define MAX_HEALTH  100
 #define MAX_STAMINA 100
+#define FRAME_WIDTH 28
 
 int  health = MAX_HEALTH;
 int  stamina = MAX_STAMINA;
 int  gold = 0;
+int  experience = 0;
+int  level = 1;
 char name[50];
 
 void saveGame();
@@ -29,6 +32,7 @@ void menu();
 void checkHealth();
 void checkStamina();
 void checkGold();
+void checkExperience();
 void buy();
 void mine();
 void combat();
@@ -90,7 +94,7 @@ void saveGame()
 	}
 
 	char buffer[256];
-	sprintf(buffer, "%s|%d|%d|%d", name, health, stamina, gold);
+	sprintf(buffer, "%s|%d|%d|%d|%d|%d", name, health, stamina, gold, experience, level);
 	encryptDecrypt(buffer);
 	fprintf(file, "%s", buffer);
 
@@ -111,7 +115,7 @@ void loadGame()
 	if (fgets(buffer, sizeof(buffer), file))
 	{
 		encryptDecrypt(buffer);
-		sscanf(buffer, "%[^|]|%d|%d|%d", name, &health, &stamina, &gold);
+		sscanf(buffer, "%[^|]|%d|%d|%d|%d|%d", name, &health, &stamina, &gold, &experience, &level);
 	}
 
 	fclose(file);
@@ -130,10 +134,20 @@ void pause()
 
 void header()
 {
-	printf("=== GOLDRUSHX - v%.1f ===\n", appversion);
-	printf("Player: %s | Gold: %d\n", name, gold);
-	printf("Health: %d | Stamina: %d\n", health, stamina);
-	printf("--------------------------\n\n");
+	char name_trunc[20];
+	snprintf(name_trunc, sizeof(name_trunc), "%.15s", name);
+	if (strlen(name) > 15)
+		strcat(name_trunc, "...");
+
+	printf("+------------------------------+\n");
+	printf("| GOLDRUSHX v%-18.1f|\n", appversion);
+	printf("+------------------------------+\n");
+	printf("| Player : %-20s|\n", name_trunc);
+	printf("| Gold   : %-20d|\n", gold);
+	printf("+------------------------------+\n");
+	printf("| Health : %03d  Stamina : %03d  |\n", health, stamina);
+	printf("| XP     : %03d  Level   : %d    |\n", experience, level);
+	printf("+------------------------------+\n\n");
 }
 
 void enterName()
@@ -184,7 +198,22 @@ void checkGold()
 {
 	if (gold <= 0)
 	{
-		printf("\nYou are broke. Get a life\n\n");
+		printf("\n\nYou are broke. Get a life\n\n");
+		pause();
+	}
+}
+
+void checkExperience()
+{
+	if (experience < 0)
+	{
+		experience = 0;
+	}
+	if (experience >= 100)
+	{
+		experience = 0;
+		level += 1;
+		printf("\n\nCongratulations! You leveled up!\n\n");
 		pause();
 	}
 }
@@ -286,7 +315,7 @@ void buy()
 			}
 			else
 			{
-				checkGold();
+				printf("\n\nYou are broke. Get a life\n\n");
 				pause();
 			}
 		}
@@ -311,7 +340,7 @@ void buy()
 			}
 			else
 			{
-				checkGold();
+				printf("\n\nYou are broke. Get a life\n\n");
 				pause();
 			}
 		}
@@ -349,12 +378,15 @@ void mine()
 			stamina -= staminaLoss;
 			int loot = rand() % 50 + 1;
 			gold += loot;
+			int xpGain = rand() % 21 + 5;
+			experience += xpGain;
 			checkGold();
 			checkStamina();
 			printf("\n\n");
-			saveGame();
-			printf("\nYou found %d gold and lost %d stamina!\n\n", loot, staminaLoss);
+			printf("\nYou found %d gold, lost %d stamina and gain %d experience!\n\n", loot, staminaLoss, xpGain);
 			pause();
+			checkExperience();
+			saveGame();
 		}
 		else
 		{
@@ -388,17 +420,20 @@ void combat()
 			}
 
 			int damage = rand() % 26 + 5;
-			int staminaLoss = rand() % 31 + 10;
-			int loot = rand() % 91 + 10;
 			health -= damage;
+			int staminaLoss = rand() % 31 + 10;
 			stamina -= staminaLoss;
+			int loot = rand() % 91 + 10;
 			gold += loot;
+			int xpGain = rand() % 31 + 10;
+			experience += xpGain;
 			checkHealth();
 			checkStamina();
 			printf("\n");
-			saveGame();
-			printf("\nVictory! You found %d gold, lost %d health and %d stamina!\n\n", loot, damage, staminaLoss);
+			printf("\nVictory! You found %d gold, lost %d health and %d stamina and gain %d experience!\n\n", loot, damage, staminaLoss, xpGain);
 			pause();
+			checkExperience();
+			saveGame();
 		}
 		else
 		{
@@ -432,17 +467,20 @@ void combatBoss1()
 			}
 
 			int damage = rand() % 39 + 7;
-			int staminaLoss = rand() % 46 + 15;
-			int loot = rand() % 136 + 15;
 			health -= damage;
+			int staminaLoss = rand() % 46 + 15;
 			stamina -= staminaLoss;
+			int loot = rand() % 136 + 15;
 			gold += loot;
+			int xpGain = rand() % 51 + 20;
+			experience += xpGain;
 			checkHealth();
 			checkStamina();
 			printf("\n");
-			saveGame();
-			printf("\nVictory! You defeated the Boss 1 and found %d gold, lost %d health and %d stamina!\n\n", loot, damage, staminaLoss);
+			printf("\nVictory! You defeated the Boss 1 and found %d gold, lost %d health, %d stamina and gain %d experience!\n\n", loot, damage, staminaLoss, xpGain);
 			pause();
+			checkExperience();
+			saveGame();
 		}
 		else
 		{
