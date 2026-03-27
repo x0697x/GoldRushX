@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-float appversion = 0.3;
+float appversion = 0.4;
 
 #define MAX_HEALTH  100
 #define MAX_STAMINA 100
