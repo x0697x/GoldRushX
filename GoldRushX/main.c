@@ -12,6 +12,7 @@
 #include <time.h>
 
 float appversion = 0.3;
+
 #define MAX_HEALTH  100
 #define MAX_STAMINA 100
 #define FRAME_WIDTH 28
@@ -27,13 +28,17 @@ void saveGame();
 void loadGame();
 void pause();
 void enterName();
+
 void header();
 void menu();
+
 void checkHealth();
 void checkStamina();
 void checkGold();
 void checkExperience();
+
 void buy();
+
 void mine();
 void combat();
 void combatBoss1();
@@ -61,9 +66,9 @@ int main()
 	{
 		enterName();
 	}
-
 	printf("Welcome to GoldRushX version %.1f, %s!\n\n", appversion, name);
 	pause();
+
 	menu();
 
 	printf("\nThanks for playing GoldRushX!\n");
