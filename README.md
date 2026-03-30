@@ -1,1 +1,1 @@
-My first game in C only
+My first Terminal game in C only
